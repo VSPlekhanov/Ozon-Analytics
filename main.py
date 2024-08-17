@@ -8,7 +8,7 @@ import time
 import gspread
 import csv
 from datetime import datetime, timedelta
-import chardet  # Добавляем библиотеку chardet для автоматического определения кодировки
+import chardet
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -92,14 +92,12 @@ def sales_analytics(date_start, metrics, dimensions, filters, sort, limit, offse
     combined_df = pd.DataFrame()
     output_file = os.path.join(output_directory, "sales_analytics_combined.csv")
 
-    # Проверка существования файла и загрузка старых данных
     if os.path.exists(output_file):
-        # Определяем кодировку файла
+
         with open(output_file, 'rb') as f:
             result = chardet.detect(f.read())
             file_encoding = result['encoding']
 
-        # Чтение файла с использованием определенной кодировки
         try:
             combined_df = pd.read_csv(output_file, encoding=file_encoding)
             if not combined_df.empty:
@@ -192,11 +190,9 @@ def sales_analytics(date_start, metrics, dimensions, filters, sort, limit, offse
                 print(f"Что-то пошло не так! Ошибка отличная от 400, 403, 404, 409, 429, 500.")
             break
 
-    # Преобразование даты и сортировка
     combined_df['date'] = pd.to_datetime(combined_df['date'], format="%Y-%m-%d")
     combined_df = combined_df.sort_values(by='date', ascending=False)
 
-    # Сохранение файла с обновленными данными
     combined_df.to_csv(output_file, index=False, encoding='utf-8-sig')
 
 def stock_on_warehouses(limit, offset, warehouse_type):
