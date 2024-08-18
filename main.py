@@ -32,7 +32,8 @@ with open(client_id_file, 'r') as f:
 gc = gspread.service_account(google_sheet_credentials)
 
 def date_to():
-    return datetime.today().strftime("%Y-%m-%d")
+    return (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+
 
 def add_days_to_date_ozon(date_str, days_to_add):
     date = datetime.strptime(date_str, "%Y-%m-%d")
@@ -93,7 +94,6 @@ def sales_analytics(date_start, metrics, dimensions, filters, sort, limit, offse
     output_file = os.path.join(output_directory, "sales_analytics_combined.csv")
 
     if os.path.exists(output_file):
-
         with open(output_file, 'rb') as f:
             result = chardet.detect(f.read())
             file_encoding = result['encoding']
@@ -113,7 +113,7 @@ def sales_analytics(date_start, metrics, dimensions, filters, sort, limit, offse
 
     while True:
         date_end = add_days_to_date_ozon(date_start, 7)
-        if datetime.strptime(date_end, "%Y-%m-%d") > datetime.today():
+        if datetime.strptime(date_end, "%Y-%m-%d") > datetime.strptime(date_to(), "%Y-%m-%d"):
             date_end = date_to()
 
         url = "https://api-seller.ozon.ru/v1/analytics/data"
@@ -244,7 +244,7 @@ def stock_on_warehouses(limit, offset, warehouse_type):
         print('Внутренняя ошибка сервера.')
     else:
         print(f"Что-то пошло не так! Ошибка отличная от 400, 403, 404, 409, 429, 500.")
-    
+
 
 def sheet_selection(list_status):
     sh = gc.open("24' Закупки")
